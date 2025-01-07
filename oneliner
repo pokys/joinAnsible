@@ -1,23 +1,7 @@
 Set-ExecutionPolicy Bypass -Scope LocalMachine -Force
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-# Stáhnout a spustit skript pro konfiguraci Ansible Remoting
 $url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
 $file = "$env:temp\ConfigureRemotingForAnsible.ps1"
 (New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
 Invoke-Expression "$file -SkipNetworkProfileCheck"
-
-# Vytvoření uživatele "ansible" s heslem "Ansiblehelper"
-$Username = "ansible"
-$Password = ConvertTo-SecureString "Ansiblehelper" -AsPlainText -Force
-$UserExists = Get-LocalUser -Name $Username -ErrorAction SilentlyContinue
-
-if ($UserExists -eq $null) {
-    Write-Host "Vytváření uživatele pro Ansible..."
-    New-LocalUser -Name $Username -Password $Password -Description 'Účet pro Ansible správu' -PasswordNeverExpires
-    Add-LocalGroupMember -Group 'Administrators' -Member $Username
-} else {
-    Write-Host "Uživatel $Username již existuje."
-}
-
-Write-Host "Ansible je povolen a uživatel $Username byl vytvořen a přidán do skupiny Administrators."
+$Username="ansible"; $Password=ConvertTo-SecureString "Ansiblehelper" -AsPlainText -Force; if (-not (Get-LocalUser -Name $Username -ErrorAction SilentlyContinue)) { New-LocalUser -Name $Username -Password $Password -Description 'Účet pro Ansible správu' -PasswordNeverExpires; Add-LocalGroupMember -Group 'Administrators' -Member $Username; Write-Host "Uživatel $Username vytvořen a přidán do Administrators." } else { Write-Host "Uživatel $Username již existuje." }
