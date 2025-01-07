@@ -1,1 +1,12 @@
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { iwr -useb https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 | iex; $Username = 'ansible'; $Password = ConvertTo-SecureString 'Ansiblehelper' -AsPlainText -Force; New-LocalUser -Name $Username -Password $Password -Description 'Účet pro Ansible správu' -PasswordNeverExpires; Add-LocalGroupMember -Group 'Administrators' -Member $Username; Write-Host 'Ansible je povolen a účet ansible byl vytvořen.' }"
+
+	Set-ExecutionPolicy Bypass -Scope LocalMachine -Force
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+	$url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+	$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+	(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+	Invoke-Expression "$file -SkipNetworkProfileCheck"
+
+
+
+Set-ExecutionPolicy Bypass -Scope LocalMachine -Force	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12	$url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"	$file = "$env:temp\ConfigureRemotingForAnsible.ps1"	(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)	Invoke-Expression "$file -SkipNetworkProfileCheck"
