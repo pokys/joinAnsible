@@ -1,33 +1,6 @@
-
-# 1. Instalace OpenSSH Server
-Write-Host "Instalace OpenSSH Server..."
-Add-WindowsFeature -Name OpenSSH-Server
-
-# 2. Spuštění a povolení služby SSH
-Write-Host "Spuštění SSH serveru a nastavení pro automatický start..."
-Start-Service sshd
-Set-Service -Name sshd -StartupType 'Automatic'
-
-# 3. Povolení SSH přes firewall
-Write-Host "Povolení SSH přes firewall..."
-New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Protocol TCP -Action Allow -LocalPort 22
-
-# 4. Ověření, že SSH server běží
-Write-Host "Ověření, že SSH server běží..."
-Get-Service -Name sshd
-
-# 5. Vytvoření uživatele pro Ansible (pokud ještě neexistuje)
-$Username = "ansible"
-$Password = ConvertTo-SecureString "Ansiblehelper" -AsPlainText -Force
-$UserExists = Get-LocalUser -Name $Username -ErrorAction SilentlyContinue
-
-if ($UserExists -eq $null) {
-    Write-Host "Vytváření uživatele pro Ansible..."
-    New-LocalUser -Name $Username -Password $Password -Description 'Účet pro Ansible správu' -PasswordNeverExpires
-    Add-LocalGroupMember -Group 'Administrators' -Member $Username
-} else {
-    Write-Host "Uživatel $Username již existuje."
-}
-
-Write-Host "SSH server je povolen, uživatel pro Ansible byl vytvořen a je přidán do skupiny Administrators."
-Write-Host "Nyní byste měli být schopni použít Ansible pro připojení přes SSH na tuto stanici."
+Set-ExecutionPolicy Bypass -Scope LocalMachine -Force
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+Invoke-Expression "$file -SkipNetworkProfileCheck"
