@@ -10,3 +10,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& { iwr -useb https://ra
 
 
 Set-ExecutionPolicy Bypass -Scope LocalMachine -Force	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12	$url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"	$file = "$env:temp\ConfigureRemotingForAnsible.ps1"	(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)	Invoke-Expression "$file -SkipNetworkProfileCheck"
+
+
+Set-ExecutionPolicy Bypass -Scope LocalMachine -Force
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Stáhnutí skriptu pomocí Invoke-WebRequest (modernější způsob)
+$url = "https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+$file = Join-Path $env:TEMP "ConfigureRemotingForAnsible.ps1"
+Invoke-WebRequest -Uri $url -OutFile $file
+
+# Správné spuštění skriptu
+powershell -ExecutionPolicy Bypass -File $file -SkipNetworkProfileCheck
